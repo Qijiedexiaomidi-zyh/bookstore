@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.abc.bookstore.client.user.dao.UserDao">
+
+    <insert id="addUser">
+        insert into user (email,username,password,gender,telephone,introduce,activeCode)
+        values (#{email},#{username},#{password},#{gender},#{telephone},#{introduce},#{activeCode})
+    </insert>
+
+    <update id="activeUser">
+        update user set state=1 where activeCode=#{activeCode}
+    </update>
+
+    <select id="findEmail" resultType="User">
+        select * from user where email=#{email}
+    </select>
+
+    <select id="findUsername" resultType="User">
+        select * from user where username=#{username}
+    </select>
+
+    <select id="login" resultType="User">
+        select * from user where username=#{username} and password=#{password}
+    </select>
+
+    <update id="modifyUser">
+        update user set password=#{password},gender=#{gender},telephone=#{telephone} where id=#{id}
+    </update>
+
+</mapper>

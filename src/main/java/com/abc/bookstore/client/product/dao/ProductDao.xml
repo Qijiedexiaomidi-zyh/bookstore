@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abc.bookstore.client.product.dao.ProductDao">
+
+    <select id="findProductByCategory" resultType="Product">
+        select * from products
+        <where>
+            <if test="category != null and category != ''">
+                category=#{category}
+            </if>
+        </where>
+    </select>
+
+    <select id="findProductById" resultType="Product">
+        select * from products where id=#{id}
+    </select>
+
+    <select id="MenuSearchSerlvet" resultType="Product">
+        select * from products
+        <where>
+            <if test="name !=null and name != ''">
+                name like "%" #{name} "%"
+            </if>
+        </where>
+    </select>
+
+    <!--  在提交订单的时候，减少库存值  -->
+    <update id="updateProductPnum">
+        update products set pnum = pnum - #{buynum} where id = #{product.id}
+    </update>
+
+<!--  在删除订单的时候，恢复库存值  -->
+    <update id="updatePnum">
+        update products set pnum = pnum + #{buynum} where id = #{product.id}
+    </update>
+
+<!--  查看热卖商品  -->
+    <select id="findHotProduct" resultType="Product">
+        select products.id,products.name,products.imgurl,products.price,sum(orderitem.buynum) totalnum
+        from products,orders,orderitem
+        where orders.paystate = 1
+        and orders.ordertime > DATE_SUB(NOW(),INTERVAL 7 DAY)
+        and orders.id = orderitem.order_id
+        and products.id = orderitem.product_id
+        group by products.id
+        order by totalnum desc
+        limit 0,2
+    </select>
+
+</mapper>

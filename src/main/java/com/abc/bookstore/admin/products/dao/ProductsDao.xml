@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abc.bookstore.admin.products.dao.ProductsDao">
+
+    <select id="listProduct" resultType="Product">
+        select * from products
+    </select>
+
+    <select id="findProductByManyCondition" resultType="Product">
+        select * from products
+        <where>
+            <if test="product.id != null and product.id != ''">
+                id = #{product.id}
+            </if>
+            <if test="product.name != null and product.name != ''">
+                and name like '%' #{product.name} '%'
+            </if>
+            <if test="product.category != null and product.category != ''">
+                and category = #{product.category}
+            </if>
+            <if test="maxprice > 0">
+                and price &lt;= #{maxprice}
+            </if>
+            <if test="minprice > 0">
+                and price &gt;= #{minprice}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addProduct">
+        insert into products (id,name,price,pnum,imgurl,category,description)
+        values (#{id},#{name},#{price},#{pnum},#{imgurl},#{category},#{description})
+    </insert>
+
+    <select id="findProductById" resultType="Product">
+        select * from products where id = #{id}
+    </select>
+
+    <update id="editProduct">
+        update products
+        <set>
+            <if test="name != null and name != ''">
+                name=#{name},
+            </if>
+            <if test="price > 0">
+                price=#{price},
+            </if>
+            <if test="pnum > 0">
+                pnum=#{pnum},
+            </if>
+            <if test="imgurl != null and imgurl != ''">
+                imgurl=#{imgurl},
+            </if>
+            <if test="category != null and category != ''">
+                category=#{category},
+            </if>
+            <if test="description != null and description != ''">
+                description=#{description}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProduct">
+        delete from products where id = #{id}
+    </delete>
+
+    <select id="findSalenum" resultType="ProductVo">
+        select products.name,sum(orderitem.buynum) salenum
+        from products,orders,orderitem
+        where orders.paystate = 1
+        and orderitem.order_id = orders.id
+        and orderitem.product_id = products.id
+        and year(ordertime) = #{year}
+        and month(ordertime) = #{month}
+        group by products.id
+        order by salenum desc
+    </select>
+
+</mapper>
